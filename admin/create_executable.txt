@@ -1,0 +1,22 @@
+create_executable.txt
+
+options
+
+1) cx-Freeze
+https://anthony-tuininga.github.io/cx_Freeze/
+- issue: https://github.com/anthony-tuininga/cx_Freeze/issues/410
+will be solved in next release
+or try:
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#cx_freeze
+
+
+2) PyInstaller
+https://www.youtube.com/watch?v=UZX5kH72Yx4&feature=emb_rel_pause
+pip install pyinstaller
+pyinstaller --onefile -w space_wars_v0.08.py 
+- Fails as well
+
+3) NSIS
+https://www.youtube.com/watch?v=UZX5kH72Yx4&feature=emb_rel_pause
+https://nsis.sourceforge.io/Download
+- not tried yet

@@ -1,0 +1,21 @@
+Websties with pictures and fonts
+
+Icons:
+------
+https://www.flaticon.com/
+
+
+Pictures:
+---------
+https://www.freepik.com/
+
+
+Fonts:
+------
+https://www.dafont.com/
+
+
+Pygame Tutorial for Beginners - Python Game Development Course
+--------------------------------------------------------------
+https://www.youtube.com/watch?v=FfWpgLFMI7w
+https://github.com/attreyabhatt/Space-Invaders-Pygame

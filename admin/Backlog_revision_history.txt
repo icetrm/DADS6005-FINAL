@@ -1,0 +1,68 @@
+Bcklog of items to improve in SpaceWars and tracking when implemented.
+
+----------------------------------------------------
+Backlog
+----------------------------------------------------
+
+- Admin:	Improve verison control
+- Admin:	Update info on GitHub
+- Admin:	Create executable 
+- Code: 	Use pygame.transform.flip() to flip images (instead of _usd) 
+- Code:		Classes in separate file for reuse ? 
+- Code: 	Use pygame.Sprites for objects and Groups (major update)
+
+
+- Menu/Code:Separate setting files, possible to change (CONSTANTS)
+				fullscreen, speed, sounds (on/off), etc.
+- Menu:		Choose difficulty level
+- Menu:		Choose spaceship
+- Menu:		Pasue: P, Q and/or Esc : to pause mini menu
+				continue, to menu, quit game
+
+
+- Steering:	Add additional buttons for e.g. fire
+- Steering: Add option of touchpad and/or mouse
+ 
+- Bullets:	Multiple bullets (remedy higher speed)
+
+- Aliens:	Shoot back
+
+
+
+----------------------------------------------------
+Done
+----------------------------------------------------
+v0.01	Old v0.8 of SpaceInvadors as base
+v0.02	Menu:	Adding Pause
+v0.03	Game: 	Moving background 
+v0.03	Admin:	Upload to Github
+v0.04	New background picture with stars
+v0.05	Renamed lists from images to image
+v0.05	Hit_points for enemies = level
+v0.05	Code:	Add better path support (for e.g. image folder for mac)
+v0.06	Player:	Longer explosion when player hit
+v0.07	Code:	Add global text constants
+v0.07	Code: 	Add dsiplay text functions
+v0.07	Menu:	Add Buttons [Yes] & [No]
+v0.09	Skipped version - not working "Put classes in separate file space_classes.py"
+v0.10	Full screen mode
+v0.10	Introdution of game constants (NAME, SPEED, etc.)
+v0.10	Menu:	Save high scores (leaderboard)
+v0.10	Code:	Cerated SQLite DB for the High Scores
+
+
+
+Old SpaceInvadors
+----------------------------------------------------
+v0.06	Add loop to restart game
+v0.06	Add starting page
+v0.07	Aliens: Steer in screen (now many are outside)
+v0.07	Aliens: Different speeds (keep original speed?)
+v0.07	Aliens: Explosions images
+v0.08	Minor game updates, e.g. new images and colors
+
+
+
+ 	 
+
+
