@@ -33,25 +33,27 @@ import logging
 import time
 import joblib
 #import space_wars_settings as sws
-
+from kafka import KafkaProducer
+from json import dumps
+import pandas as pd
 # ------------------
 # Netpie
 # ------------------
-
-import microgear.client as microgear
+# https://netpie.readthedocs.io/th/latest/PieSketch/netpie/microgear.html
+# import microgear.client as microgear
 import logging
 import time
 
 score_list = []
 publish_time = datetime.now()
 
-appid = 'datastream'
-gearkey = 'qY0dhxc3TAswzeC'
-gearsecret = 'eNInuhdaicInPOJl0KfPrBJfS'
-user_score_topic = '/user_score_topic'
+# appid = 'datastream'
+# gearkey = 'ycsw5SKD8GLqvLFxuyTQgWzJzAkzhyyb'
+# gearsecret = '_w96t!)Gb5chVFtKzBFAoW3fKfR8LpmC'
+# user_score_topic = '/user_score_topic'
 
-microgear.create(gearkey, gearsecret, appid, {'debugmode': True})
-microgear.setalias("tanapong")
+# microgear.create(gearkey, gearsecret, appid, {'debugmode': True})
+# microgear.setalias("tanapong")
 
 def connection():
     logging.info("Now I am connected with netpie")
@@ -61,9 +63,10 @@ def subscription(topic, message):
 	global score_list
 
 	try:
-		if topic == f"/{appid}{user_score_topic}" and message:
-			score = json.loads(ast.literal_eval(message).decode('utf-8'))
-			score_list.append(score)
+		# if topic == f"/{appid}{user_score_topic}" and message:
+		# 	score = json.loads(ast.literal_eval(message).decode('utf-8'))
+		# 	score_list.append(score)
+		pass
 	except Exception:
 		pass
 	logging.info(topic + " " + message)
@@ -71,11 +74,11 @@ def subscription(topic, message):
 def disconnect():
     logging.info("disconnected")
 
-microgear.on_connect = connection
-microgear.on_message = subscription
-microgear.on_disconnect = disconnect
-microgear.subscribe(user_score_topic)
-microgear.connect(False)
+# microgear.on_connect = connection
+# microgear.on_message = subscription
+# microgear.on_disconnect = disconnect
+# microgear.subscribe(user_score_topic)
+# microgear.connect(False)
 
 ### Analytic Model
 dt_scaler = joblib.load('./model/scaler.bin')
@@ -243,14 +246,14 @@ class Button:
 
 	# internal only function ?
 	def text_objects(text, font, color):
-	    text_surface = font.render(text, True, color)
-	    return text_surface, text_surface.get_rect()
+		text_surface = font.render(text, True, color)
+		return text_surface, text_surface.get_rect()
 
 	# internal only function ?
 	def message_display_center(text, font, color, centerX, centerY):
-	    text_surface, text_rectangle = text_objects(text, font, color)
-	    text_rectangle.center = (centerX,centerY)
-	    screen.blit(text_surface, text_rectangle)
+		text_surface, text_rectangle = text_objects(text, font, color)
+		text_rectangle.center = (centerX,centerY)
+		screen.blit(text_surface, text_rectangle)
 
 	def show(self, mouse=(0,0)):
 		if self.X < mouse[0] < self.X + self.width and self.Y < mouse[1] < self.Y + self.hight:
@@ -265,6 +268,39 @@ class Button:
 		else:
 			self.clicked = False
 
+class TextInputBox(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, font):
+        super().__init__()
+        self.color = (255, 255, 255)
+        self.backcolor = None
+        self.pos = (x, y) 
+        self.width = w
+        self.font = font
+        self.active = False
+        self.text = ""
+        self.render_text()
+
+    def render_text(self):
+        t_surf = self.font.render(self.text, True, self.color, self.backcolor)
+        self.image = pygame.Surface((max(self.width, t_surf.get_width()+10), t_surf.get_height()+10), pygame.SRCALPHA)
+        if self.backcolor:
+            self.image.fill(self.backcolor)
+        self.image.blit(t_surf, (5, 5))
+        pygame.draw.rect(self.image, self.color, self.image.get_rect().inflate(-2, -2), 2)
+        self.rect = self.image.get_rect(topleft = self.pos)
+
+    def update(self, event_list):
+        for event in event_list:
+            if event.type == pygame.MOUSEBUTTONDOWN and not self.active:
+                self.active = self.rect.collidepoint(event.pos)
+            if event.type == pygame.KEYDOWN and self.active:
+                if event.key == pygame.K_RETURN:
+                    self.active = False
+                elif event.key == pygame.K_BACKSPACE:
+                    self.text = self.text[:-1]
+                else:
+                    self.text += event.unicode
+                self.render_text()
 
 
 # ----------------------------
@@ -405,7 +441,7 @@ def menu():
 def paused(screen_sizeX, screen_sizeY):
 
 	largeText = pygame.font.SysFont("freesansbold",115)
-	TextSurf, TextRect = text_objects("Paused", largeText)
+	TextSurf, TextRect = text_objects("Paused", largeText, white)
 	TextRect.center = ((screen_sizeX/2),(screen_sizeX/2))
 	screen.blit(TextSurf, TextRect)
 
@@ -504,7 +540,7 @@ def publish_online_score(score, name, game_over):
 	now = datetime.now()
 	if (now - publish_time).seconds >= sending_interval:
 		data = dict(user=name, score=score)
-		microgear.publish(user_score_topic, json.dumps(data))
+		# microgear.publish(user_score_topic, json.dumps(data))
 		publish_time = now
 
  
@@ -543,8 +579,11 @@ def show_game_over(screen_sizeX, screen_sizeY, score, high_score, coin_count, us
 # Initialize Global CONSTANTS from space_wars_settings.py (sws)
 MUSIC 		= False 		#sws.MUSIC 		# True
 GAME_SPEED 	= 5 		#sws.GAME_SPEED 	# 1 to 5
-PLAYER_NAME	= 'Peach'		#sws.PLAYER_NAME	# 'DAN'
+PLAYER_NAME	= ''		#sws.PLAYER_NAME	# 'DAN'
 
+while PLAYER_NAME == '':
+	PLAYER_NAME = input('Enter your name: ')
+print('Hello, ' + PLAYER_NAME)
 
 # Initialize Global variables
 screen_sizeX = 800
@@ -600,7 +639,7 @@ clock = pygame.time.Clock()
 
 # Initialize connection to high score database
 db_connection = high_scores.high_scores_connect_to_db('high_scores.db')
-high_scores.high_scores_create_table(db_connection)
+# high_scores.high_scores_create_table(db_connection)
 
 # Initialize settings
 player_maxSpeedX	= 3.5			# recommended: 3
@@ -625,14 +664,15 @@ A8 = 0  # A8) key Y pressed count
 A9 = 0  # A9) Number of enemy created
 A10 = 0  # A10) Number of coin created
 
+producer = KafkaProducer(bootstrap_servers=['localhost:29092'], value_serializer=lambda x: dumps(x).encode('utf-8'))
 
 def thread_collect_data():
-    global thread, A0, A1, A2, A3, A4, A5, player
-    if not go_to_menu and not quit_game:
-	    A0 += [player.posX]
-	    A1 += [player.posY]
-	    thread = threading.Timer(1, thread_collect_data)
-	    thread.start()
+	global thread, A0, A1, A2, A3, A4, A5, player
+	if not go_to_menu and not quit_game:
+		A0 += [player.posX]
+		A1 += [player.posY]
+		thread = threading.Timer(1, thread_collect_data)
+		thread.start()
 
 def save_collection_data(level, keyX_pressed_count, keyY_pressed_count, respawn_enemy_count, respawn_coin_count):
 	global A0, A1
@@ -651,12 +691,16 @@ def save_collection_data(level, keyX_pressed_count, keyY_pressed_count, respawn_
 		with open("train_data.txt", "a") as file_object:
 			file_object.write(",".join(map(str, [A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10])))
 			file_object.write("\n")
+		df = pd.DataFrame([[A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10 ]], columns=['A0', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10'])
+		data = {'data' : df.to_dict('records')[0], 'player': PLAYER_NAME}
+		producer.send('space-wars-events', key='SPACE_WARS'.encode('utf-8'), value=data)
 
 # --------------------
 # Full Game Play Loop
 # --------------------
 
 quit_game = False
+
 while not quit_game:
 
 	# Start manu
@@ -763,13 +807,13 @@ while not quit_game:
 			num_of_enemies	+= level_enemy_increase
 
 			# increase number of coin with same speed
-			for i in range(num_of_coins, num_of_coins + num_of_coins):
+			for i in range(num_of_coins, num_of_coins + level_score_increase):
 				coins.append(SpaceCoin(coin_image, explosion_image[0], speedY = level, hit_points = 1))
 				respawn(coins[i], level)
 				respawn_coin_count += 1
 
 			# increase score when reaching new level
-#			score += level_score_increase
+			# score += level_score_increase
 
 		# Check events and take action
 		for event in pygame.event.get():	
@@ -785,8 +829,7 @@ while not quit_game:
 
 				# 'p' or ESC' for pause 
 				elif event.key == pygame.K_p or event.key == pygame.K_ESCAPE:
-				 	paused(screen_sizeX, screen_sizeY)
-
+					paused(screen_sizeX, screen_sizeY)
 				# 'arrow keys' for movement
 				elif event.key == pygame.K_LEFT:
 					player.speedX = -player_maxSpeedX
@@ -910,7 +953,8 @@ while not quit_game:
 
 	# Update High Score database
 	if score > 0:
-		high_scores.high_scores_update_db(db_connection, PLAYER_NAME, score)
+		# high_scores.high_scores_update_db(db_connection, PLAYER_NAME, score)
+		print(f"score: {score}")
 
 	save_collection_data(level, keyX_pressed_count, keyY_pressed_count, respawn_enemy_count, respawn_coin_count)
 

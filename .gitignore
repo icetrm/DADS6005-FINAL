@@ -1,1 +1,6 @@
-/__pycache__
+__pycache__/
+
+high_scores/__pycache__/
+
+*.pyc
+*.cache
